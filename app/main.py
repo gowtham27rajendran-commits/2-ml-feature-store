@@ -5,7 +5,7 @@ from app.store.feature_store import (
     OnlineFeatureStore, FeatureRegistry, FeatureDefinition, FeatureValue
 )
 import time
-import datetime
+
 
 app = FastAPI(title="ML Feature Store", version="1.0.0")
 
