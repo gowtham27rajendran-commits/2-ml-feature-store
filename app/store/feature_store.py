@@ -1,11 +1,3 @@
-"""
-Feature Store — Core Engine
-
-Responsibilities:
-1. Feature ingestion (online + offline write)
-2. Feature retrieval (online serving)
-3. Feature registry (schema + versioning)
-"""
 import redis
 import json
 import time
@@ -39,11 +31,6 @@ class FeatureValue:
 
 
 class FeatureRegistry:
-    """
-    Central catalog of all feature definitions.
-    In production: backed by a persistent DB (PostgreSQL), not in-memory dict.
-    Provides lineage: which pipeline produced this feature, when, from what source.
-    """
     def __init__(self):
         self._registry: Dict[str, FeatureDefinition] = {}
 
@@ -62,15 +49,6 @@ class FeatureRegistry:
 class OnlineFeatureStore:
     """
     Redis-backed online store for real-time inference.
-
-    Storage format: Redis Hash
-    Key:   feature:{entity_id}
-    Field: {feature_name}:{version}
-    Value: JSON{value, timestamp}
-
-    Why Redis Hash over separate keys?
-    Fetching ALL features for an entity = 1 HGETALL vs N GET calls.
-    For a model needing 50 features, this is 50x fewer round trips.
     """
     def __init__(self, redis_url: str = "redis://localhost:6379/0"):
         self.client = redis.from_url(redis_url, decode_responses=True)
@@ -127,11 +105,6 @@ class OnlineFeatureStore:
 class OfflineFeatureStore:
     """
     S3 + Parquet offline store for batch training.
-
-    TODO: Implement these methods:
-    - write_batch(features: List[FeatureValue]) → write Parquet to S3
-    - point_in_time_join(entity_df, feature_names, timestamp_col) → pd.DataFrame
-      This is the hard part — see pit_join.py scaffold
     """
     def write_batch(self, features):
         # TODO: use pandas + pyarrow to write partitioned Parquet
